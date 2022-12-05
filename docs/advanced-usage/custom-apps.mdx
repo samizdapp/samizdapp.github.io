@@ -1,0 +1,56 @@
+---
+description: >
+  Use your box to host your own apps.
+
+sidebar_position: 1
+---
+
+import InfoBox from "@site/src/components/info-box";
+
+# Installing Custom Apps
+
+You can host your own applications on your box by installing them as custom
+apps.
+
+<InfoBox>
+  Currently, custom apps are not able to interact with other apps, talk to other
+  boxes, or be accessed from the client via the SamizdApp network. Check back
+  for new updates as we continue to improve this feature.
+</InfoBox>
+
+## `POST` to `/app/manifests` API
+
+Custom apps are docker compose manifests that are managed by our REST API.
+
+You can install a new custom app by sending a `POST` request to
+`http://samizdapp.local/smz/api/app/manifests` with the following body:
+
+- `name`: Name of your app.
+- `manifest`: JSON-encoded contents of a docker compose manifest your app will run.
+
+This `POST` body would create an app named `my-jupyter-app` that runs an
+instance of jupyter, using the `jupyter/minimal-notebook` docker image.
+
+```json
+{
+  "name": "my-jupyter-app",
+  "manifest": "\nservices:\n  jupyter-minimal:\n    image: jupyter/minimal-notebook\n    network_mode: host\n"
+}
+```
+
+## Wait For Your App to Start
+
+After the POST request is sent, your box, assuming it is currently running,
+will being installing your app. Depending on the size of your app and the speed
+of your box's internet connection, this could take up to several minutes.
+
+You can ssh into your box and run:
+
+```bash
+balena-engine container ls | grep $YOUR_APP_NAME
+```
+
+to see when your app has started.
+
+Once your app is running, you should be able to access it via `samizdapp.local`
+or the IP address of your box via whatever ports it is listening on.
